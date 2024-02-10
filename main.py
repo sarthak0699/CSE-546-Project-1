@@ -4,6 +4,7 @@ from typing import Optional
 
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -30,7 +31,7 @@ async def read_root():
     # result = image_results[image.filename.split(".")[0]]
     return {"hello":"hello"}
 
-@app.post("/", tags=["Root"])
+@app.post("/", tags=["Root"],response_class=PlainTextResponse)
 async def read_root(inputFile:UploadFile = File(...)):
     result = image_results[inputFile.filename.split(".")[0]]
     return inputFile.filename.split(".")[0] +":" + result
