@@ -1,31 +1,37 @@
-'''
-Minimal example using fastAPI.
-'''
+
+import csv
 from typing import Optional
 
-from fastapi import FastAPI
+from fastapi import FastAPI, File, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-
-class Employee(BaseModel):
-    first_name: str
-    last_name: str
-    company: str
-    age: int
-    phone: Optional[str] = None
-
-
 app = FastAPI()
+origins = ["*"]
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-@app.get("/")
-def hello():
-    return {"Hello": "API"}
+image_results = {}
 
+with open('./data/classification_results.csv', newline='') as csvfile:
+    reader = csv.reader(csvfile, delimiter=',')
+    for row in reader:
+        image_results[row[0]] = row[1]
+        
 
-@app.post("/create_employee/")
-def create_employee(employee: Employee):
-    return {
-        "status": "created",
-        "data": employee
-    }
+@app.get("/check", tags=["Root"])
+async def read_root():
+    # result = image_results[image.filename.split(".")[0]]
+    return {"hello":"hello"}
+
+@app.post("/", tags=["Root"])
+async def read_root(inputFile:UploadFile = File(...)):
+    result = image_results[inputFile.filename.split(".")[0]]
+    return {inputFile.filename.split(".")[0]: result}
+
