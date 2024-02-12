@@ -33,6 +33,7 @@ async def read_root():
 
 @app.post("/", tags=["Root"],response_class=PlainTextResponse)
 async def read_root(inputFile:UploadFile = File(...)):
-    result = image_results[inputFile.filename.split(".")[0]]
-    return inputFile.filename.split(".")[0] +":" + result
+    filename = inputFile.filename.split(".")[0]
+    result = image_results[filename]
+    return filename +":" + result
 
