@@ -40,4 +40,4 @@ async def startup_event():
 async def read_root(inputFile: UploadFile = File(...)):
     filename = inputFile.filename.split(".")[0]
     result = image_results.get(filename, "Unknown")
-    return f"{filename}: {result}"
+    return f"{filename}:{result}"
