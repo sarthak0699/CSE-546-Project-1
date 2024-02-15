@@ -31,9 +31,9 @@ async def startup_event():
     await load_classification_results()
 
 
-# @app.get("/check", tags=["Root"])
-# async def read_root():
-#     return {"hello": "hello"}
+@app.get("/check", tags=["Root"])
+async def read_root():
+    return {"hello": "hello"}
 
 
 @app.post("/", tags=["Root"], response_class=PlainTextResponse)
