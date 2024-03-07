@@ -22,7 +22,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-def startup(background_tasks: BackgroundTasks):
+def startup():
     asyncio.create_task(autoscaling_controller())
 
 async def autoscaling_controller():
