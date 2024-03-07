@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse
 from fastapi import BackgroundTasks
 import boto3
+import asyncio
 
 app = FastAPI()
 origins = ["*"]
@@ -46,8 +47,8 @@ async def autoscaling_controller():
 
 # Load classification results asynchronously during startup
 @app.on_event("startup")
-async def startup_event(background_tasks:BackgroundTasks):
-    background_tasks.add_task(autoscaling_controller)
+async def startup_event():
+    asyncio.create_task(autoscaling_controller())
     return 
 
 
