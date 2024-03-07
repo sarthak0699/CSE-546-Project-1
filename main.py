@@ -25,7 +25,7 @@ app.add_middleware(
 def startup():
     asyncio.create_task(autoscaling_controller)
 
-def autoscaling_controller():
+async def autoscaling_controller():
     ec2_resources = boto3.resource('ec2',region_name='us-east-1')
     
     while True:
@@ -35,7 +35,7 @@ def autoscaling_controller():
 
         response = sqs.send_message(QueueUrl=request_queue_url,MessageBody=str(count))
         print(response)
-        time.sleep(10)
+        await asyncio.sleep(10)
         break
         
 
