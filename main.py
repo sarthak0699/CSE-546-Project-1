@@ -23,7 +23,7 @@ app.add_middleware(
 )
 
 def startup(background_tasks: BackgroundTasks):
-    background_tasks.add_task(autoscaling_controller)
+    asyncio.create_task(autoscaling_controller())
 
 async def autoscaling_controller():
     ec2_resources = boto3.resource('ec2',region_name='us-east-1')
@@ -35,13 +35,12 @@ async def autoscaling_controller():
 
         response = sqs.send_message(QueueUrl=request_queue_url,MessageBody=str(count))
         print(response)
-        time.sleep(1)
+        time.sleep(10)
         
 
 @app.on_event("startup")
 async def startup_event():
     startup()
-    return 
 
 
 @app.get("/check", tags=["Root"])
