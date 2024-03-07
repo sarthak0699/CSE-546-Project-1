@@ -12,7 +12,7 @@ app = FastAPI()
 origins = ["*"]
 request_queue_url = "https://sqs.us-east-1.amazonaws.com/339712806862/1225316534-req-queue"
 
-sqs = boto3.client('sqs',region_name = 'us-east-1')
+sqs = boto3.client('sqs',region_name ='us-east-1')
 
 app.add_middleware(
     CORSMiddleware,
@@ -32,7 +32,7 @@ async def load_classification_results():
             image_results[row[0]] = row[1]
 
 async def autoscaling_controller():
-    ec2_resources = boto3.resource('ec2')
+    ec2_resources = boto3.resource('ec2',region_name='us-east-1')
     
     while True:
         instances = ec2_resources.instances
