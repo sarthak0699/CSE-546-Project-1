@@ -1,6 +1,8 @@
 import base64
 import csv
+import json
 import time
+import uuid
 
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -33,7 +35,7 @@ async def autoscaling_controller():
         instances = ec2_resources.instances.all()
         
         count = len(list(instances)) - 1
-        print(count)        
+                
         await asyncio.sleep(10)
         
 
@@ -54,5 +56,12 @@ async def read_root(inputFile: UploadFile = File(...)):
     encoded_contents = base64.b64encode(file_contents)
 
     encoded_string = encoded_contents.decode('utf-8')
+    request_id = str(uuid.uuid4())
+    
 
-    return f"bruh"
+    message_object = json.dumps({ "request_id":request_id, "encoded_image": encoded_string})
+
+    q_response = sqs.send_message(QueueUrl = request_queue_url,MessageBody=message_object)
+    
+
+    return f"${q_response}"
