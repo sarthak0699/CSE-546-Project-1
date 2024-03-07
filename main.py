@@ -30,7 +30,7 @@ async def autoscaling_controller():
     
     while True:
         instances = ec2_resources.instances.all()
-        print(len(instances))
+        print(len(list(instances)))
         count = 1
 
         response = sqs.send_message(QueueUrl=request_queue_url,MessageBody=str(count))
