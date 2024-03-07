@@ -23,7 +23,7 @@ app.add_middleware(
 )
 
 def startup():
-    asyncio.create_task(autoscaling_controller)
+    asyncio.create_task(autoscaling_controller())
 
 async def autoscaling_controller():
     ec2_resources = boto3.resource('ec2',region_name='us-east-1')
