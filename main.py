@@ -1,3 +1,4 @@
+import base64
 import csv
 import time
 
@@ -30,11 +31,9 @@ async def autoscaling_controller():
     
     while True:
         instances = ec2_resources.instances.all()
-        print(len(list(instances)))
-        count = 1
-
-        response = sqs.send_message(QueueUrl=request_queue_url,MessageBody=str(count))
         
+        count = len(list(instances)) - 1
+        print(count)        
         await asyncio.sleep(10)
         
 
@@ -50,6 +49,10 @@ async def read_root():
 
 @app.post("/", tags=["Root"], response_class=PlainTextResponse)
 async def read_root(inputFile: UploadFile = File(...)):
-    filename = inputFile.filename.split(".")[0]
-    # result = image_results.get(filename, "Unknown")
+    file_contents = await inputFile.read()
+
+    encoded_contents = base64.b64encode(file_contents)
+
+    encoded_string = encoded_contents.decode('utf-8')
+
     return f"bruh"
