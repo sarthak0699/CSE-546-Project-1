@@ -22,14 +22,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-image_results = {}
-
-
-async def load_classification_results():
-    with open('./data/classification_results.csv', newline='') as csvfile:
-        reader = csv.reader(csvfile, delimiter=',')
-        for row in reader:
-            image_results[row[0]] = row[1]
+def startup(background_tasks: BackgroundTasks):
+    background_tasks.add_task(autoscaling_controller)
 
 async def autoscaling_controller():
     ec2_resources = boto3.resource('ec2',region_name='us-east-1')
@@ -42,15 +36,11 @@ async def autoscaling_controller():
         response = sqs.send_message(QueueUrl=request_queue_url,MessageBody=str(count))
         print(response)
         time.sleep(1)
-        break
-        # response = ec2_client.describe_instances()
-        
         
 
-# Load classification results asynchronously during startup
 @app.on_event("startup")
 async def startup_event():
-    asyncio.create_task(autoscaling_controller())
+    startup()
     return 
 
 
@@ -62,5 +52,5 @@ async def read_root():
 @app.post("/", tags=["Root"], response_class=PlainTextResponse)
 async def read_root(inputFile: UploadFile = File(...)):
     filename = inputFile.filename.split(".")[0]
-    result = image_results.get(filename, "Unknown")
-    return f"{filename}:{result}"
+    # result = image_results.get(filename, "Unknown")
+    return f"bruh"
