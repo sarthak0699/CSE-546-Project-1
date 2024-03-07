@@ -1,4 +1,5 @@
 import csv
+import time
 
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -38,6 +39,7 @@ async def autoscaling_controller():
 
         response = sqs.send_message(QueueUrl=request_queue_url,MessageBody=str(count))
         print(response)
+        time.sleep(1)
         # response = ec2_client.describe_instances()
         
         
@@ -45,6 +47,7 @@ async def autoscaling_controller():
 # Load classification results asynchronously during startup
 @app.on_event("startup")
 async def startup_event(background_tasks:BackgroundTasks):
+    background_tasks.add_task(autoscaling_controller)
     return 
 
 
