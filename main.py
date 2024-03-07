@@ -36,7 +36,6 @@ async def autoscaling_controller():
         response = sqs.send_message(QueueUrl=request_queue_url,MessageBody=str(count))
         print(response)
         await asyncio.sleep(10)
-        break
         
 
 @app.on_event("startup")
