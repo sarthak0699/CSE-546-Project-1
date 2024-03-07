@@ -29,12 +29,12 @@ async def autoscaling_controller():
     ec2_resources = boto3.resource('ec2',region_name='us-east-1')
     
     while True:
-        instances = ec2_resources.instances
-        print(instances)
+        instances = ec2_resources.instances.all()
+        print(len(instances))
         count = 1
 
         response = sqs.send_message(QueueUrl=request_queue_url,MessageBody=str(count))
-        print(response)
+        
         await asyncio.sleep(10)
         
 
