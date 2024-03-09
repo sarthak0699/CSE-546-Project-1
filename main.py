@@ -64,7 +64,11 @@ async def autoscaling_controller():
         
         instances_to_start = sorted_stopped_instances[0:numberOfInstanceToBeCreated]
         
-        print(instances_to_start)
+        for instance in instances_to_start:
+            instance.start()
+            print(f'Starting instance {instance.id}')
+
+
                 
         await asyncio.sleep(5)
         
