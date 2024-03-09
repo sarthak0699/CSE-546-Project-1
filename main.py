@@ -43,6 +43,7 @@ async def autoscaling_controller():
 
         if requestCount == 0:
             await asyncio.sleep(5)
+            continue
             
         instances = ec2_resources.instances.all()
         stopped_instances = []
