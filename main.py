@@ -58,10 +58,8 @@ async def autoscaling_controller():
 
         print(stoppedInstanceCount)
 
-        numberOfInstanceToBeStarted = min(requestCount,stoppedInstanceCount)    
+        numberOfInstanceToBeStarted = min(10,stoppedInstanceCount)    
         
-        print(numberOfInstanceToBeStarted)
-
         if numberOfInstanceToBeStarted > 0 :
             instances_to_start = sorted_stopped_instances[0:numberOfInstanceToBeStarted]
         
@@ -69,7 +67,7 @@ async def autoscaling_controller():
                 instance.start()
                 print(f'Starting instance {instance.id}')
                         
-        await asyncio.sleep(35)
+        await asyncio.sleep(60)
         
 
 @app.on_event("startup")
