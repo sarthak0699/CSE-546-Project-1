@@ -14,6 +14,7 @@ import asyncio
 app = FastAPI()
 origins = ["*"]
 request_queue_url = "https://sqs.us-east-1.amazonaws.com/339712806862/1225316534-req-queue"
+region = 'us-east-1'
 
 sqs = boto3.client('sqs',region_name ='us-east-1')
 
@@ -29,12 +30,19 @@ def startup():
     asyncio.create_task(autoscaling_controller())
 
 async def autoscaling_controller():
-    ec2_resources = boto3.resource('ec2',region_name='us-east-1')
-    
+
+    ec2_resources = boto3.resource('ec2',region_name=region)
+    sqs_resources = boto3.resource('sqs',region_name=region)
+
     while True:
         instances = ec2_resources.instances.all()
+        instanceCount = len(list(instances)) - 1
+
+        queue = sqs.Queue(request_queue_url)
+        requestCount = queue.attributes['ApproximateNumberOfMessages']
         
-        count = len(list(instances)) - 1
+        print(instanceCount)
+        print(requestCount)
                 
         await asyncio.sleep(10)
         
