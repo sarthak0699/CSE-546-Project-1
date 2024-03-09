@@ -53,15 +53,16 @@ async def autoscaling_controller():
             
         sorted_stopped_instances = sorted(stopped_instances, key=lambda instance: [tag['Value'] for tag in instance.tags if tag['Key'] == 'Name'][0] if any(tag['Key'] == 'Name' for tag in instance.tags) else '')
 
-        stoppedInstanceCount = len(stopped_instances) 
+        stoppedInstanceCount = len(sorted_stopped_instances) 
 
         print(stoppedInstanceCount)
 
+        numberOfInstanceToBeStarted = min(requestCount,stoppedInstanceCount)    
         
-        numberOfInstanceToBeCreated = min(requestCount,stoppedInstanceCount)    
+        print(numberOfInstanceToBeStarted)
 
-        if numberOfInstanceToBeCreated > 0 :
-            instances_to_start = sorted_stopped_instances[0:numberOfInstanceToBeCreated]
+        if numberOfInstanceToBeStarted > 0 :
+            instances_to_start = sorted_stopped_instances[0:numberOfInstanceToBeStarted]
         
             for instance in instances_to_start:
                 instance.start()
