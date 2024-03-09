@@ -39,7 +39,7 @@ async def autoscaling_controller():
 
     while True:
         queue = sqs_resources.Queue(REQUEST_QUEUE_URL)
-        requestCount = queue.attributes['ApproximateNumberOfMessages']
+        requestCount = int(queue.attributes['ApproximateNumberOfMessages'])
 
         if requestCount == 0:
             await asyncio.sleep(5)
