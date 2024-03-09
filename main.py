@@ -16,7 +16,7 @@ origins = ["*"]
 request_queue_url = "https://sqs.us-east-1.amazonaws.com/339712806862/1225316534-req-queue"
 region = 'us-east-1'
 
-sqs = boto3.client('sqs',region_name ='us-east-1')
+# sqs = boto3.client('sqs',region_name ='us-east-1')
 
 app.add_middleware(
     CORSMiddleware,
@@ -38,7 +38,7 @@ async def autoscaling_controller():
         instances = ec2_resources.instances.all()
         instanceCount = len(list(instances)) - 1
 
-        queue = sqs.Queue(request_queue_url)
+        queue = sqs_resources.Queue(request_queue_url)
         requestCount = queue.attributes['ApproximateNumberOfMessages']
         
         print(instanceCount)
