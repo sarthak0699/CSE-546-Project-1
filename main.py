@@ -13,10 +13,13 @@ import asyncio
 
 app = FastAPI()
 origins = ["*"]
-request_queue_url = "https://sqs.us-east-1.amazonaws.com/339712806862/1225316534-req-queue"
-region = 'us-east-1'
-
+REQUEST_QUEUE_URL = "https://sqs.us-east-1.amazonaws.com/339712806862/1225316534-req-queue"
+REGION = 'us-east-1'
+APP_TIER_INSTANCE = "app-tier-instance-"
 sqs = boto3.client('sqs',region_name ='us-east-1')
+ec2 = boto3.client('ec2',region_name ='us-east-1')
+
+role_arn = "arn:aws:iam::339712806862:role/web-tier-role"
 
 app.add_middleware(
     CORSMiddleware,
@@ -31,20 +34,37 @@ def startup():
 
 async def autoscaling_controller():
 
-    ec2_resources = boto3.resource('ec2',region_name=region)
-    sqs_resources = boto3.resource('sqs',region_name=region)
+    ec2_resources = boto3.resource('ec2',region_name=REGION)
+    sqs_resources = boto3.resource('sqs',region_name=REGION)
 
     while True:
-        instances = ec2_resources.instances.all()
-        instanceCount = len(list(instances)) - 1
-
-        queue = sqs_resources.Queue(request_queue_url)
+        queue = sqs_resources.Queue(REQUEST_QUEUE_URL)
         requestCount = queue.attributes['ApproximateNumberOfMessages']
+
+        if requestCount == 0:
+            await asyncio.sleep(5)
+            
+        instances = ec2_resources.instances.all()
+        stopped_instances_id = []
+
+        for instance in instances:
+            if instance.state['Name'] == 'stopped':
+                stopped_instances_id.append(instance.id)
+            
+
+
+        stoppedInstanceCount = len(stopped_instances_id) 
+
+        print(stoppedInstanceCount)
+
         
-        print(instanceCount)
-        print(requestCount)
+        numberOfInstanceToBeCreated = min(requestCount,20-stoppedInstanceCount)    
+
+        print(numberOfInstanceToBeCreated)
+
+        
                 
-        await asyncio.sleep(10)
+        await asyncio.sleep(5)
         
 
 @app.on_event("startup")
@@ -69,7 +89,7 @@ async def read_root(inputFile: UploadFile = File(...)):
 
     message_object = json.dumps({ "request_id":request_id, "encoded_image": encoded_string})
 
-    q_response = sqs.send_message(QueueUrl = request_queue_url,MessageBody=message_object)
+    q_response = sqs.send_message(QueueUrl = REQUEST_QUEUE_URL,MessageBody=message_object)
     
 
     return f"${q_response}"
