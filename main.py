@@ -58,7 +58,7 @@ async def autoscaling_controller():
         print(stoppedInstanceCount)
 
         
-        numberOfInstanceToBeCreated = min(requestCount,20-stoppedInstanceCount)    
+        numberOfInstanceToBeCreated = min(requestCount,stoppedInstanceCount)    
 
         print(numberOfInstanceToBeCreated)
 
