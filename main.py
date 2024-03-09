@@ -52,7 +52,7 @@ async def autoscaling_controller():
                 stopped_instances.append(instance)
             
         sorted_stopped_instances = sorted(stopped_instances, key=lambda instance: [tag['Value'] for tag in instance.tags if tag['Key'] == 'Name'][0] if any(tag['Key'] == 'Name' for tag in instance.tags) else '')
-
+        print(sorted_stopped_instances)
         stoppedInstanceCount = len(sorted_stopped_instances) 
 
         print(stoppedInstanceCount)
