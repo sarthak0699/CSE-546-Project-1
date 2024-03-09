@@ -51,8 +51,7 @@ async def autoscaling_controller():
             if instance.state['Name'] == 'stopped':
                 stopped_instances.append(instance)
             
-        sorted_stopped_instances = sorted(stopped_instances, key=lambda instance: instance.tags[0]['Value'] if instance.tags else '')
-
+        sorted_stopped_instances = sorted(stopped_instances, key=lambda instance: [tag['Value'] for tag in instance.tags if tag['Key'] == 'Name'][0] if any(tag['Key'] == 'Name' for tag in instance.tags) else '')
 
         stoppedInstanceCount = len(stopped_instances) 
 
@@ -70,7 +69,7 @@ async def autoscaling_controller():
 
 
                 
-        await asyncio.sleep(5)
+        await asyncio.sleep(30)
         
 
 @app.on_event("startup")
