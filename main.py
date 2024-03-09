@@ -45,24 +45,26 @@ async def autoscaling_controller():
             await asyncio.sleep(5)
             
         instances = ec2_resources.instances.all()
-        stopped_instances_id = []
+        stopped_instances = []
 
         for instance in instances:
             if instance.state['Name'] == 'stopped':
-                stopped_instances_id.append(instance.id)
+                stopped_instances.append(instance)
             
+        sorted_stopped_instances = sorted(stopped_instances, key=lambda instance: instance.tags[0]['Value'] if instance.tags else '')
 
 
-        stoppedInstanceCount = len(stopped_instances_id) 
+        stoppedInstanceCount = len(stopped_instances) 
 
         print(stoppedInstanceCount)
 
         
         numberOfInstanceToBeCreated = min(requestCount,stoppedInstanceCount)    
 
-        print(numberOfInstanceToBeCreated)
-
         
+        instances_to_start = sorted_stopped_instances[0:numberOfInstanceToBeCreated]
+        
+        print(instances_to_start)
                 
         await asyncio.sleep(5)
         
