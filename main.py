@@ -16,7 +16,7 @@ origins = ["*"]
 request_queue_url = "https://sqs.us-east-1.amazonaws.com/339712806862/1225316534-req-queue"
 region = 'us-east-1'
 
-# sqs = boto3.client('sqs',region_name ='us-east-1')
+sqs = boto3.client('sqs',region_name ='us-east-1')
 
 app.add_middleware(
     CORSMiddleware,
