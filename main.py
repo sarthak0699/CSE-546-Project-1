@@ -34,6 +34,7 @@ app.add_middleware(
 
 def startup():
     asyncio.create_task(autoscaling_controller())
+    asyncio.create_task(results_mapper())
 
 async def results_mapper():
     sqs_resources = boto3.resource('sqs',region_name=REGION)
