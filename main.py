@@ -48,7 +48,7 @@ def results_mapper():
         responseCount = int(queue.attributes['ApproximateNumberOfMessages'])
         
         if responseCount == 0:
-            asyncio.sleep(1)
+            time.sleep(1)
             continue
 
         response = sqs.receive_message(
@@ -85,7 +85,7 @@ def autoscaling_controller():
         requestCount = int(queue.attributes['ApproximateNumberOfMessages'])
 
         if requestCount == 0:
-            asyncio.sleep(5)
+            time.sleep(5)
             continue
             
         instances = ec2_resources.instances.all()
@@ -110,7 +110,7 @@ def autoscaling_controller():
                 instance.start()
                 print(f'Starting instance {instance.id}')
                         
-        asyncio.sleep(60)
+        time.sleep(60)
         
 
 @app.on_event("startup")
