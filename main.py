@@ -34,6 +34,8 @@ app.add_middleware(
 )
 
 def startup():
+    global thread1,thread2
+
     thread1 = threading.Thread(target=autoscaling_controller)
     thread2 = threading.Thread(target=results_mapper)
 
@@ -101,7 +103,8 @@ def autoscaling_controller():
 
         print(stoppedInstanceCount)
 
-        numberOfInstanceToBeStarted = min(10,stoppedInstanceCount)    
+        minInstances = max(10,requestCount)
+        numberOfInstanceToBeStarted = min(minInstances,stoppedInstanceCount)    
         
         if numberOfInstanceToBeStarted > 0 :
             instances_to_start = sorted_stopped_instances[0:numberOfInstanceToBeStarted]
@@ -116,7 +119,6 @@ def autoscaling_controller():
 @app.on_event("startup")
 async def startup_event():
     startup()
-
 
 @app.get("/check", tags=["Root"])
 async def read_root():

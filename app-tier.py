@@ -41,7 +41,7 @@ async def poll_queue():
         response = sqs.receive_message(
             QueueUrl=request_queue_url,
             MaxNumberOfMessages=1,
-            WaitTimeSeconds=10
+            WaitTimeSeconds=0
         )
         print(count)
         message = response.get('Messages', None)
@@ -78,7 +78,7 @@ async def poll_queue():
         else:
             count += 1
         
-        if count == 20:
+        if count == 300:
             instance_id = requests.get("http://169.254.169.254/latest/meta-data/instance-id").text
             response = ec2.stop_instances(InstanceIds=[instance_id])
             print(response)
