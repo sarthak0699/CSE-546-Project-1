@@ -137,7 +137,7 @@ async def read_root(inputFile: UploadFile = File(...)):
     results_map[request_id] = None
 
     while results_map[request_id] == None:
-        continue
+        await asyncio.sleep(1)
 
     response_string = f"${inputFile.filename.split('.')[0]}:{results_map[request_id]}"
     
