@@ -1,6 +1,7 @@
 import base64
 import csv
 import json
+import threading
 import time
 import uuid
 
@@ -33,8 +34,12 @@ app.add_middleware(
 )
 
 def startup():
-    asyncio.create_task(autoscaling_controller())
-    asyncio.create_task(results_mapper())
+    thread1 = threading.Thread(target=autoscaling_controller)
+    thread2 = threading.Thread(target=results_mapper)
+
+    thread1.start()
+    thread2.start()
+
 
 async def results_mapper():
     sqs_resources = boto3.resource('sqs',region_name=REGION)
@@ -43,13 +48,13 @@ async def results_mapper():
         responseCount = int(queue.attributes['ApproximateNumberOfMessages'])
         
         if responseCount == 0:
-            await asyncio.sleep(1)
+            asyncio.sleep(1)
             continue
 
         response = sqs.receive_message(
             QueueUrl=RESPONSE_QUEUE_URL,
             MaxNumberOfMessages=10,
-            WaitTimeSeconds=10
+            WaitTimeSeconds=1
         )
 
         messages = response.get('Messages',None)
@@ -66,7 +71,7 @@ async def results_mapper():
                     QueueUrl = RESPONSE_QUEUE_URL,
                     ReceiptHandle = message['ReceiptHandle']
                 )
-        await asyncio.sleep(1)
+        asyncio.sleep(1)
             
 
 
@@ -80,7 +85,7 @@ async def autoscaling_controller():
         requestCount = int(queue.attributes['ApproximateNumberOfMessages'])
 
         if requestCount == 0:
-            await asyncio.sleep(5)
+            asyncio.sleep(5)
             continue
             
         instances = ec2_resources.instances.all()
@@ -105,7 +110,7 @@ async def autoscaling_controller():
                 instance.start()
                 print(f'Starting instance {instance.id}')
                         
-        await asyncio.sleep(60)
+        asyncio.sleep(60)
         
 
 @app.on_event("startup")
