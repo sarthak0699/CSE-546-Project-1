@@ -110,7 +110,7 @@ def autoscaling_controller():
                 instance.start()
                 print(f'Starting instance {instance.id}')
                         
-        time.sleep(60)
+        time.sleep(180)
         
 
 @app.on_event("startup")
