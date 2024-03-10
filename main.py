@@ -1,7 +1,6 @@
 import base64
 import csv
 import json
-from threading import Thread
 import time
 import uuid
 
@@ -34,13 +33,8 @@ app.add_middleware(
 )
 
 def startup():
-    thread1 = Thread(target=autoscaling_controller)
-    thread1.daemon = True
-    thread1.start()
-
-    thread2 = Thread(target=results_mapper)
-    thread2.daemon = True
-    thread2.start()
+    asyncio.create_task(autoscaling_controller())
+    asyncio.create_task(results_mapper())
 
 async def results_mapper():
     sqs_resources = boto3.resource('sqs',region_name=REGION)
