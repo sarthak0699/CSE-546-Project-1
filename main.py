@@ -41,7 +41,7 @@ def startup():
     thread2.start()
 
 
-async def results_mapper():
+def results_mapper():
     sqs_resources = boto3.resource('sqs',region_name=REGION)
     while True:
         queue = sqs_resources.Queue(RESPONSE_QUEUE_URL)
@@ -75,7 +75,7 @@ async def results_mapper():
             
 
 
-async def autoscaling_controller():
+def autoscaling_controller():
 
     ec2_resources = boto3.resource('ec2',region_name=REGION)
     sqs_resources = boto3.resource('sqs',region_name=REGION)
