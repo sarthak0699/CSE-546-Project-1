@@ -14,12 +14,15 @@ import asyncio
 app = FastAPI()
 origins = ["*"]
 REQUEST_QUEUE_URL = "https://sqs.us-east-1.amazonaws.com/339712806862/1225316534-req-queue"
+RESPONSE_QUEUE_URL = "https://sqs.us-east-1.amazonaws.com/339712806862/1225316534-resp-queue"
 REGION = 'us-east-1'
 APP_TIER_INSTANCE = "app-tier-instance-"
 sqs = boto3.client('sqs',region_name ='us-east-1')
 ec2 = boto3.client('ec2',region_name ='us-east-1')
 
 role_arn = "arn:aws:iam::339712806862:role/web-tier-role"
+
+results_map = {}
 
 app.add_middleware(
     CORSMiddleware,
@@ -31,6 +34,40 @@ app.add_middleware(
 
 def startup():
     asyncio.create_task(autoscaling_controller())
+
+async def results_mapper():
+    sqs_resources = boto3.resource('sqs',region_name=REGION)
+    while True:
+        queue = sqs_resources.Queue(RESPONSE_QUEUE_URL)
+        responseCount = int(queue.attributes['ApproximateNumberOfMessages'])
+        
+        if responseCount == 0:
+            await asyncio.sleep(1)
+            continue
+
+        response = sqs.receive_message(
+            QueueUrl=RESPONSE_QUEUE_URL,
+            MaxNumberOfMessages=50,
+            WaitTimeSeconds=10
+        )
+
+        messages = response.get('Messages',None)
+
+        if messages:
+            for message in messages:
+                body = message['Body']
+                bodyObject = json.loads(body)
+                
+                if bodyObject['request_id'] in results_map:
+                    results_map[bodyObject['request_id']] = bodyObject['result']
+                
+                sqs.delete_message(
+                    QueueUrl = RESPONSE_QUEUE_URL,
+                    ReceiptHandle = message['ReceiptHandle']
+                )
+
+            
+
 
 async def autoscaling_controller():
 
@@ -95,4 +132,16 @@ async def read_root(inputFile: UploadFile = File(...)):
     q_response = sqs.send_message(QueueUrl = REQUEST_QUEUE_URL,MessageBody=message_object)
     
 
-    return f"${q_response}"
+    print(q_response)
+
+    results_map[request_id] = None
+
+    while results_map[request_id] == None:
+        continue
+
+    response_string = f"${inputFile.filename.split('.')[0]}:{results_map[request_id]}"
+    
+    print(response_string)
+
+    results_map.pop(request_id)
+    return response_string

@@ -70,7 +70,7 @@ async def poll_queue():
             print(s3_in_response)
 
             name = name.split('.')[0]
-            s3_out_response = s3.put_object(Body = decoded_bytes,Bucket = OUT_BUCKET,Key=name)
+            s3_out_response = s3.put_object(Body = result,Bucket = OUT_BUCKET,Key=name)
             print(s3_out_response)
 
 
