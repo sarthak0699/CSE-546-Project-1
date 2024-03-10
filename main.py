@@ -48,7 +48,7 @@ async def results_mapper():
 
         response = sqs.receive_message(
             QueueUrl=RESPONSE_QUEUE_URL,
-            MaxNumberOfMessages=50,
+            MaxNumberOfMessages=10,
             WaitTimeSeconds=10
         )
 
