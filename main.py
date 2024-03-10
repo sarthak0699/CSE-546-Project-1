@@ -71,7 +71,7 @@ def results_mapper():
                     QueueUrl = RESPONSE_QUEUE_URL,
                     ReceiptHandle = message['ReceiptHandle']
                 )
-        asyncio.sleep(1)
+        time.sleep(1)
             
 
 
@@ -143,7 +143,7 @@ async def read_root(inputFile: UploadFile = File(...)):
     results_map[request_id] = None
 
     while results_map[request_id] == None:
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.5)
 
     response_string = f"{inputFile.filename.split('.')[0]}:{results_map[request_id]}"
     
