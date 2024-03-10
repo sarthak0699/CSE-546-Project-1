@@ -90,7 +90,7 @@ async def read_root(inputFile: UploadFile = File(...)):
     request_id = str(uuid.uuid4())
     
 
-    message_object = json.dumps({ "request_id":request_id, "encoded_image": encoded_string})
+    message_object = json.dumps({ "request_id":request_id, "encoded_image": encoded_string,"name":inputFile.filename})
 
     q_response = sqs.send_message(QueueUrl = REQUEST_QUEUE_URL,MessageBody=message_object)
     
