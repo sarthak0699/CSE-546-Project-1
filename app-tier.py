@@ -78,7 +78,7 @@ async def poll_queue():
         else:
             count += 1
         
-        if count == 300:
+        if count == 30:
             instance_id = requests.get("http://169.254.169.254/latest/meta-data/instance-id").text
             response = ec2.stop_instances(InstanceIds=[instance_id])
             print(response)
